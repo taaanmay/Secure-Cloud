@@ -4,6 +4,7 @@ import sys
 import getpass
 import pickle
 import menus
+import main
 menu = menus
 
 # Function to write data in a file
@@ -35,7 +36,6 @@ def sign_in():
 
         # Get Username and Password for Authentication
         username, password = get_credentials()   
-        
 
         # If credentials match, show menu
             # If username is admin 
@@ -43,7 +43,11 @@ def sign_in():
         if username in accounts and accounts[username] == password :
             if username == "admin" :
                 print("Welcome, Admin! Sign-In Successful")                         
+                
+                # Global variable is_current_user_admin 
+                main.is_current_user_admin = True
                 menu.get_admin_menu()
+            
             else:
                 print("Sign-In Successful")
                 menu.get_regular_menu()
@@ -51,8 +55,8 @@ def sign_in():
         # Credentials do not match. Ask if you want to try again.
         else:
             print("Sign-In Unsuccessful. Do you want to try again? (Yes or No)")
-            response = input()
-            if response == "Yes":
+            response = str.upper(input())
+            if response == "YES":
                 sign_in()    
             else :
                 exit()    
@@ -66,7 +70,7 @@ def get_credentials():
     
     try :
         # Ask for Username
-        username = input("Username : ")
+        username = str.lower(input("Username : "))
         
         # Get Pass method to get password
         password = getpass.getpass()
@@ -78,56 +82,73 @@ def get_credentials():
     
 # Function to sign-up a new user
 def sign_up():
-    print("Please choose an Username & Password to Sign-Up\n\n")
+    
+    
     
     try :
         print("--- SIGN-UP ---")
-        # Ask for Username
-        username = input("Username : ")
+        print("\nPlease choose an Username & Password to Sign-Up\n")
+        if os.path.getsize("accounts.pkl") != 0:
+            print("To go back, enter `BACK`")
         
-        duplicate_username = True
-        # Check for no duplicate username
-        while duplicate_username == True:
-            if username in accounts :
-                print("This username has been taken. Please Choose a new one.")
-                # Ask for Username
-                username = input("Username : ")
-            else :
-                duplicate_username = False
-                
-                # Get Pass method to get password
-                password = getpass.getpass()
-                
-                # Store the username and password in accounts
-                accounts[username] = password     
-                writeToFile(accounts,"accounts.pkl")
-                print("Sign-Uo Successful.")
+        # Ask for Username
+        username = str.lower(input("Username : "))
+        
+        # If user types BACK, go back to Admin Menu
+        if str.upper(username) == "BACK" and os.path.getsize("accounts.pkl") != 0:
+            print("Going Back to Admin Menu...")
+        
+        else:
+            duplicate_username = True
+            # Check for no duplicate username
+            while duplicate_username == True:
+                if username in accounts or username == "back":
+                    print("This username has been taken. Please Choose a new one.")
+                    # Ask for Username
+                    username = str.lower(input("Username : "))
+                else :
+                    duplicate_username = False
+                    
+                    # Get Pass method to get password
+                    password = getpass.getpass()
+                    
+                    # Store the username and password in accounts
+                    accounts[username] = password     
+                    writeToFile(accounts,"accounts.pkl")
+                    print(".\n.\nSign-Up Successful.\n")
 
-                # Navigate to Admin's Menu as only admin can sign new people up
-                menu.get_admin_menu()
-  
+                    # Navigate to Admin's Menu as only admin can sign new people up
+                    menu.get_admin_menu()
+    
     except KeyboardInterrupt:
         exit() 
 
 def remover_User():
+    print("-- REMOVE --")
     print("Please enter the username of the person to remove the user from the group")
+    print("To go back, enter `BACK`")
     try :
         # Ask for Username
-        username = input("Username : ")
+        username = str.lower(input("Username : "))
+        
+        if str.upper(username) == "BACK":
+            print("Going Back to Admin Menu...")
         
         # Check if Username is in accounts
-        if username in accounts:
+        elif username in accounts:
             del accounts[username]
             writeToFile(accounts,"accounts.pkl")
-            print(username," Removed" )
+            print(".\n.\n",username," Removed\n" )
 
         else:
-            print(username," does not exist")
+            print(username," does not exist. Try Again or enter `BACK`")
+            remover_User()
  
     except KeyboardInterrupt:
         exit()
 
 # Function to close the application
+    # This function is used by different files as well
 def exit():
     print("\n-->  TK Secure Cloud App Shutting Down...\nGoodbye.")
     sys.exit()
