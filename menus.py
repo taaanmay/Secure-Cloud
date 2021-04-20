@@ -85,7 +85,17 @@ def get_regular_menu():
 			user_input = input("\n>> ")
 
 			if str.upper(user_input) == "UPLOAD":
-				print("upload_function() called")
+				filename = input("\nEnter the filename you want to upload : ")
+				path = "Uploads/" + filename
+				
+				if os.path.exists(path):
+					
+					# Upload File
+					googleDrive.upload_file(filename, path)
+
+				else:
+					print("PATH >> ",path)
+					print("File could not be found. Please check if the file is in Uploads Folder")	
 			
 			elif str.upper(user_input) == "DOWNLOAD":
 				
@@ -96,7 +106,7 @@ def get_regular_menu():
 				if file_ID != -1 :
 					googleDrive.download_file(file_ID, filename)
 				else:
-					print("Trouble Downloading Files")
+					print("File Not Found on Drive.")
 
 			elif str.upper(user_input) == "LIST":
 				googleDrive.list_files()
