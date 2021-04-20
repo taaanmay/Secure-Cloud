@@ -1,3 +1,4 @@
+# pylint: disable=unused-variable
 import os
 import io
 import sys
@@ -35,9 +36,13 @@ def list_files() :
     if not items:
         print('No files found.')
     else:
-        print('\n\nFiles on Google Drive:')
+        print('\n\nFiles on Google Drive: \n')
+        count = 1
         for item in items:
-            print(u'{0} ({1})'.format(item['name'], item['id']))
+            print(u'({0}){1}'.format(count,item['name']))
+            count = count + 1
+    
+    print("\n")
 
 # Function that returns the file_ID of the required file
 def get_file_id(request):
@@ -74,4 +79,84 @@ def download_file(file_ID, filename) :
         fh.seek(0)
         f.write(fh.read())
 
+
+# Function to Upload file to Google Drive
+def upload_file(filename, path):
+   
+    mimetype = file_type(filename)
+    
+    file_metadata = {'name': filename}
+    media = MediaFileUpload(path, mimetype=mimetype)
+    
+    # pylint: disable=maybe-no-member
+    file = service.files().create(body=file_metadata,
+                                        media_body=media,
+                                        fields='id').execute()
+    
+    print("File Uploaded on Google Drive")
+
+# Function to get the file extenstion
+def file_type(filename):
+
+    mime_types = dict(
+        txt='text/plain',
+        htm='text/html',
+        html='text/html',
+        php='text/html',
+        css='text/css',
+        js='application/javascript',
+        json='application/json',
+        xml='application/xml',
+        swf='application/x-shockwave-flash',
+        flv='video/x-flv',
+
+        # images
+        png='image/png',
+        jpe='image/jpeg',
+        jpeg='image/jpeg',
+        jpg='image/jpeg',
+        gif='image/gif',
+        bmp='image/bmp',
+        ico='image/vnd.microsoft.icon',
+        tiff='image/tiff',
+        tif='image/tiff',
+        svg='image/svg+xml',
+        svgz='image/svg+xml',
+
+        # archives
+        zip='application/zip',
+        rar='application/x-rar-compressed',
+        exe='application/x-msdownload',
+        msi='application/x-msdownload',
+        cab='application/vnd.ms-cab-compressed',
+
+        # audio/video
+        mp3='audio/mpeg',
+        ogg='audio/ogg',
+        qt='video/quicktime',
+        mov='video/quicktime',
+
+        # adobe
+        pdf='application/pdf',
+        psd='image/vnd.adobe.photoshop',
+        ai='application/postscript',
+        eps='application/postscript',
+        ps='application/postscript',
+
+        # ms office
+        doc='application/msword',
+        rtf='application/rtf',
+        xls='application/vnd.ms-excel',
+        ppt='application/vnd.ms-powerpoint',
+
+        # open office
+        odt='application/vnd.oasis.opendocument.text',
+        ods='application/vnd.oasis.opendocument.spreadsheet',
+    )
+
+    file_extenstion = os.path.splitext(filename)[1][1:].lower()
+    if file_extenstion in mime_types:
+        return mime_types[file_extenstion]
+    else:
+        return 'application/octet-stream'
 
