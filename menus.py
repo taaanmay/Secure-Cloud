@@ -6,6 +6,7 @@ import GDrive
 import admin
 import main
 import encrypt
+import rsa_encryption
 
 googleDrive = GDrive
 encryption = encrypt
@@ -60,10 +61,8 @@ def print_regular_menu_options():
 	print('[UPLOAD] Type `UPLOAD` to encrypt a file and upload it on Google Drive')
 	print('[DOWNLOAD] Type `DOWNLOAD` to download a file and decrypt it')
 	print('[LIST] Type `LIST` to list the files on Drive')
-	
 	if main.is_current_user_admin == True:
 		print('[ADMIN] Type `ADMIN` to access Admin Menu')
-	
 	print('[EXIT] Type `EXIT` to exit')
 	#print('[MENU] Type `MENU` to go to the files menu')
 	
