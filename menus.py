@@ -5,9 +5,10 @@ import sys
 import GDrive
 import admin
 import main
-#import encrypt
+import encrypt
 
 googleDrive = GDrive
+encryption = encrypt
 
 # Function to print options available to Admin
 def print_admin_options():
@@ -75,7 +76,7 @@ def get_regular_menu():
 	exit = False
 	while exit == False:
 		try:
-			print("--- Menu ---")
+			print("\n--- Menu ---")
 			
 			# Print the list of options available to Admin
 			print_regular_menu_options()
@@ -89,9 +90,28 @@ def get_regular_menu():
 				path = "Uploads/" + filename
 				
 				if os.path.exists(path):
-					
-					# Upload File
-					googleDrive.upload_file(filename, path)
+					# Encrypt the file
+					encrypted_file_name = encryption.encrypt_file(encryption.get_key(), filename)
+
+					# If file was encrypted upload the file
+					if encrypted_file_name != None:
+						# Update Path to the Encrypted File
+						#new_path = "Uploads/" + encrypted_file_name
+						new_path = encrypted_file_name
+						# Upload File
+						googleDrive.upload_file(encrypted_file_name, new_path)
+
+						# Remove encrypted file
+						os.remove(encrypted_file_name)
+
+					# If file was not encrypted, ask the user if wants to upload the file without Encryption
+					else:
+						resp = input("File could not be encripted. Do you want to upload the file without encryption? (Yes/No)")
+						if str.upper(resp) == "YES":
+							googleDrive.upload_file(filename, path)	
+						else:
+							print("File not uploaded.")	
+							
 
 				else:
 					print("PATH >> ",path)
@@ -104,7 +124,15 @@ def get_regular_menu():
 				file_ID = googleDrive.get_file_id("name contains '"+filename+"'")
 
 				if file_ID != -1 :
+					# Download File from the drive
 					googleDrive.download_file(file_ID, filename)
+
+					# Decrypt the File and Store in Download Folder
+					down_file = encryption.decrypt_file(filename)
+					print(down_file," has been decrypted and stored in the Downloads folder")
+
+					# Delete the downloaded encrypted file
+					os.remove("Downloads/"+filename)
 				else:
 					print("File Not Found on Drive.")
 
