@@ -6,6 +6,9 @@ import pickle
 import menus
 import main
 menu = menus
+import rsa_encryption
+
+rsa = rsa_encryption
 
 # Function to write data in a file
 def writeToFile(obj, filename):
@@ -83,8 +86,6 @@ def get_credentials():
 # Function to sign-up a new user
 def sign_up():
     
-    
-    
     try :
         print("--- SIGN-UP ---")
         print("\nPlease choose an Username & Password to Sign-Up\n")
@@ -116,6 +117,14 @@ def sign_up():
                     accounts[username] = password     
                     writeToFile(accounts,"accounts.pkl")
                     print(".\n.\nSign-Up Successful.\n")
+
+                    # Generate New User's Public and Private Keys
+                    print("Generating Public and Private Keys for ",username)
+                    status = rsa.generate_RSA_keys(username)
+                    if status == True:
+                        print("Public and Private Keys of the user created in the Users folder")
+                    else:
+                        print("Public & Private keys NOT generated. Please generate them for the user.")    
 
                     # Navigate to Admin's Menu as only admin can sign new people up
                     menu.get_admin_menu()
